@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+	<head>
+		<meta charset="UTF-8">
+			<title>的小秘密❤️</title>
+
+			<style>
+				body {
+				font-family: Arial, sans-serif;
+				background-image: url("images/question.jpg");
+				background-size: cover;
+				background-position: center;
+				background-attachment: fixed;
+				text-align: center;
+				padding: 40px;
+				transition: background-image 0.8s ease-in-out;
+				}
+
+				.container {
+				background: rgba(255,255,255,0.92);
+				padding: 30px;
+				border-radius: 15px;
+				max-width: 500px;
+				margin: auto;
+				box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+				}
+
+				button {
+				display: block;
+				width: 100%;
+				padding: 12px;
+				margin-top: 10px;
+				border: none;
+				background: #ff6b81;
+				color: white;
+				border-radius: 8px;
+				cursor: pointer;
+				font-size: 16px;
+				transition: 0.2s;
+				}
+
+				button:hover {
+				background: #ff4757;
+				transform: scale(1.03);
+				}
+
+				.progress {
+				margin-bottom: 10px;
+				font-size: 14px;
+				color: #555;
+				}
+
+				.hearts {
+				font-size: 22px;
+				margin-bottom: 10px;
+				}
+
+				.hidden {
+				display: none;
+				}
+
+				.fade-in {
+				animation: fadeIn 1s ease forwards;
+				}
+
+				@keyframes fadeIn {
+				from {opacity: 0;}
+				to {opacity: 1;}
+				}
+			</style>
+		</head>
+
+	<body>
+
+		<div class="container fade-in">
+			<h2 id="title"></h2>
+			<div class="hearts" id="hearts"></div>
+			<div class="progress" id="progress"></div>
+			<div id="questionArea"></div>
+			<div id="giftArea" class="hidden"></div>
+		</div>
+
+		<script>
+
+			/* =========================
+			🔥 客製資料區（只改這裡）
+			========================= */
+
+			const gameData = {
+			girlfriendName: "小儒",
+			maxWrongAttempts: 3,
+			punishmentMessage: "💔 妳把愛心扣光了！\n懲罰是：說三次『我最愛你』再抱抱一下 ❤️",
+			questions: [
+			{
+			question: "小儒的身高幾公分？",
+			options: ["154", "165", "171", "182(這是答案)"],
+			correctIndex: 2
+			},
+			{
+			question: "小儒最喜歡自稱自己是什麼？",
+			options: ["寶可夢", "哥布林", "土豆", "逼逼拉餔"],
+			correctIndex: 1
+			},
+			{
+			question: "小儒的生日是幾月幾號？",
+			options: ["3/17", "5/20", "8/10", "12/15"],
+			correctIndex: 2
+			}
+			],
+			finalGiftMessage: "🎉 恭喜你全部答對！\n你的禮物是：小狗花束一份✿"
+			};
+
+			/* ========================= */
+
+			let currentQuestion = 0;
+			let wrongAttempts = 0;
+
+			const title = document.getElementById("title");
+			const progress = document.getElementById("progress");
+			const questionArea = document.getElementById("questionArea");
+			const giftArea = document.getElementById("giftArea");
+			const heartsDisplay = document.getElementById("hearts");
+
+			title.innerText = gameData.girlfriendName + " 的小秘密❤️";
+
+			function updateHearts() {
+			let hearts = "";
+			for (let i = 0; i < gameData.maxWrongAttempts - wrongAttempts; i++) {
+        hearts += "❤️";
+    }
+    heartsDisplay.innerText = hearts;
+}
+
+function loadQuestion() {
+    const q = gameData.questions[currentQuestion];
+
+    progress.innerText = `第 ${currentQuestion + 1} 題 / 共 ${gameData.questions.length} 題`;
+
+    let html = `<h3>${q.question}</h3>`;
+
+			q.options.forEach((option, index) => {
+			html += `<button onclick="checkAnswer(${index})">${option}</button>`;
+			});
+
+			html += `<p id="result"></p>`;
+
+			questionArea.innerHTML = html;
+			}
+
+			function checkAnswer(selectedIndex) {
+
+			const correctIndex = gameData.questions[currentQuestion].correctIndex;
+			const result = document.getElementById("result");
+			const buttons = document.querySelectorAll("#questionArea button");
+
+			if (selectedIndex === correctIndex) {
+
+			buttons.forEach(btn => btn.disabled = true);
+
+			result.innerText = "答對了！💖";
+			result.style.color = "green";
+
+			setTimeout(() => {
+			currentQuestion++;
+			if (currentQuestion < gameData.questions.length) {
+                loadQuestion();
+            } else {
+                showGift();
+            }
+        }, 800);
+
+    } else {
+
+        wrongAttempts++;
+        updateHearts();
+
+        result.innerText = "答錯了！愛心 -1 💔";
+        result.style.color = "red";
+
+        if (wrongAttempts >= gameData.maxWrongAttempts) {
+            setTimeout(() => {
+                showPunishment();
+            }, 800);
+        }
+    }
+}
+
+function showGift() {
+
+    document.body.style.backgroundImage = "url('images/gift.jpg')";
+
+    questionArea.classList.add("hidden");
+    progress.classList.add("hidden");
+    heartsDisplay.classList.add("hidden");
+    giftArea.classList.remove("hidden");
+
+    giftArea.innerHTML = `
+        <h2>🎁 驚喜解鎖 🎁</h2>
+			<p style="white-space: pre-line; font-size:18px;">
+				${gameData.finalGiftMessage}
+			</p>
+			<button onclick="restartGame()">再玩一次 ❤️</button>
+			`;
+			}
+
+			function showPunishment() {
+
+			document.body.style.backgroundImage = "url('images/punishment.jpg')";
+
+			questionArea.classList.add("hidden");
+			progress.classList.add("hidden");
+			heartsDisplay.classList.add("hidden");
+			giftArea.classList.remove("hidden");
+
+			giftArea.innerHTML = `
+			<h2>💔 挑戰失敗 💔</h2>
+			<p style="white-space: pre-line; font-size:18px;">
+				${gameData.punishmentMessage}
+			</p>
+			<button onclick="restartGame()">重新挑戰 💪</button>
+			`;
+			}
+
+			function restartGame() {
+			currentQuestion = 0;
+			wrongAttempts = 0;
+			document.body.style.backgroundImage = "url('images/question.jpg')";
+			questionArea.classList.remove("hidden");
+			progress.classList.remove("hidden");
+			heartsDisplay.classList.remove("hidden");
+			giftArea.classList.add("hidden");
+			updateHearts();
+			loadQuestion();
+			}
+
+			updateHearts();
+			loadQuestion();
+
+		</script>
+
+	</body>
+</html>
